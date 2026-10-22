@@ -1,1 +1,255 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tarutao Exploration | Clean Single Map</title>
+  
+  <!-- Fonts & Libraries -->
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Google Maps API Integration -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC5l0aPyGFqiqY5DpqOYf-8YhN_eYHHobU&callback=initMap" async defer></script>
+  
+  <style>
+    :root {
+      --marine-blue: #004e7c;
+      --ocean-teal: #00a896;
+      --sand-light: #fdfaf6;
+    }
+    
+    html { scroll-behavior: smooth; }
+    body { font-family: 'IBM Plex Sans Thai', sans-serif; background-color: var(--sand-light); color: #2d3436; line-height: 1.8; }
+    
+    .glass-nav {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
 
+    .hero-bg {
+      background: linear-gradient(rgba(0, 78, 124, 0.6), rgba(0, 78, 124, 0.6)), 
+                  url('https://images.unsplash.com/photo-1544552866-d3zd1efac7a5?auto=format&fit=crop&q=80&w=1600');
+      background-size: cover;
+      background-position: center;
+    }
+
+    .map-container {
+      height: 500px;
+      width: 100%;
+      border-radius: 1rem;
+    }
+
+    .card-hover:hover {
+      transform: translateY(-5px);
+      transition: all 0.3s ease;
+    }
+  </style>
+</head>
+<body class="text-slate-800">
+
+  <!-- 1. HEADER SECTION -->
+  <header class="hero-bg text-white py-24 px-6 text-center">
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-4xl md:text-6xl font-semibold mb-6 drop-shadow-lg">สำรวจความงามและสัดส่วนพื้นที่หมู่เกาะตะรุเตา</h1>
+      <p class="text-xl md:text-2xl opacity-90 font-light">การศึกษาเชิงนิเวศวิทยาและภูมิศาสตร์ทางทะเล</p>
+    </div>
+  </header>
+
+  <!-- 2. NAVIGATION -->
+  <nav class="glass-nav sticky top-0 z-[1000] py-4 shadow-sm">
+    <div class="max-w-6xl mx-auto px-6 flex flex-wrap justify-center gap-4 md:gap-10 text-sm font-medium">
+      <a href="#introduction" class="hover:text-cyan-600 transition-colors">📖 บทนำ</a>
+      <a href="#proportions" class="hover:text-cyan-600 transition-colors">📊 สัดส่วนพื้นที่</a>
+      <a href="#maps" class="hover:text-cyan-600 transition-colors">📍 แผนที่พิกัด</a>
+      <a href="#ecology" class="hover:text-cyan-600 transition-colors">🌿 นิเวศวิทยา</a>
+      <a href="#safety" class="hover:text-cyan-600 transition-colors">🚨 ความปลอดภัย</a>
+      <a href="#references" class="hover:text-cyan-600 transition-colors">📑 อ้างอิง</a>
+    </div>
+  </nav>
+
+  <main class="max-w-6xl mx-auto px-6 py-12">
+
+    <!-- 3. TOC SECTION -->
+    <section id="toc" class="mb-24 scroll-mt-20">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-semibold text-cyan-800">สารบัญเนื้อหา</h2>
+        <div class="h-1 w-20 bg-cyan-500 mx-auto mt-4"></div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <a href="#introduction" class="card-hover bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+          <span class="text-3xl">📖</span><span class="font-semibold text-lg">บทนำและภาพรวม</span>
+        </a>
+        <a href="#proportions" class="card-hover bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+          <span class="text-3xl">📊</span><span class="font-semibold text-lg">สัดส่วนพื้นที่</span>
+        </a>
+        <a href="#maps" class="card-hover bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+          <span class="text-3xl">📍</span><span class="font-semibold text-lg">แผนที่และพิกัด</span>
+        </a>
+        <a href="#ecology" class="card-hover bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+          <span class="text-3xl">🌿</span><span class="font-semibold text-lg">นิเวศวิทยา</span>
+        </a>
+        <a href="#safety" class="card-hover bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+          <span class="text-3xl">🚨</span><span class="font-semibold text-lg">ความปลอดภัย</span>
+        </a>
+        <a href="#references" class="card-hover bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+          <span class="text-3xl">📑</span><span class="font-semibold text-lg">เอกสารอ้างอิง</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- 4. INTRODUCTION -->
+    <section id="introduction" class="mb-24 scroll-mt-20">
+      <div class="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-slate-100">
+        <h2 class="text-2xl font-semibold mb-6 text-cyan-800">บทนำและภาพรวมเชิงภูมิศาสตร์</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 text-slate-600">
+          <p>หมู่เกาะตะรุเตา ตั้งอยู่ในเขตอุทยานแห่งชาติหมู่เกาะตะรุเตา จังหวัดสตูล มีความสำคัญอย่างยิ่งในฐานะแหล่งทรัพยากรทางทะเลที่อุดมสมบูรณ์ที่สุดแห่งหนึ่งในทะเลอันดามัน พื้นที่ประกอบด้วยหมู่เกาะขนาดใหญ่และเล็กจำนวนมาก ซึ่งแต่ละเกาะมีลักษณะทางธรณีวิทยาและระบบนิเวศที่แตกต่างกันไปตามสภาพภูมิอากาศและกระแสน้ำ</p>
+          <p>การศึกษาครั้งนี้มุ่งเน้นไปที่การทำความเข้าใจสัดส่วนการใช้พื้นที่ทางธรรมชาติ ทั้งในส่วนของป่าดิบชื้นที่ปกคลุมพื้นที่สูง แนวปะการังที่สมบูรณ์ใต้ท้องทะเล และพื้นที่ชายฝั่ง เพื่อนำข้อมูลมาใช้ในการวางแผนอนุรักษ์และจัดการการท่องเที่ยวอย่างยั่งยืน</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. AREA PROPORTIONS -->
+    <section id="proportions" class="mb-24 scroll-mt-20">
+      <h2 class="text-3xl font-semibold mb-8 border-l-8 border-cyan-500 pl-4">สัดส่วนพื้นที่เกาะตะรุเตา (ร้อยละ)</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center bg-white p-8 rounded-3xl shadow-sm">
+        <div class="h-[350px]"><canvas id="areaChart"></canvas></div >
+        <div class="space-y-4 text-lg">
+            <div class="flex justify-between p-3 bg-green-50 rounded-lg"><span class="font-medium">🌲 ป่าดิบชื้น</span><span class="font-bold text-green-600">55%</span></div >
+            <div class="flex justify-between p-3 bg-orange-50 rounded-lg"><span class="font-medium">🏖️ ชายหาด</span><span class="font-bold text-orange-500">15%</span></div >
+            <div class="flex justify-between p-3 bg-slate-50 rounded-lg"><span class="font-medium">⛰️ ภูเขา/หิน</span><span class="font-bold text-slate-500">20%</span></div >
+            <div class="flex justify-between p-3 bg-blue-50 rounded-lg"><span class="font-medium">🌊 อื่นๆ</span><span class="font-bold text-blue-500">10%</span></div >
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. MAPS SECTION (Simplified) -->
+    <section id="maps" class="mb-24 scroll-mt-20">
+      <h2 class="text-3xl font-semibold mb-8 border-l-8 border-cyan-500 pl-4">พิกัดและแผนที่ (Google Maps API)</h2>
+      <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+        <h3 class="text-lg font-semibold mb-4 text-cyan-700 flex items-center"><span class="mr-2">🇹🇭</span> ตำแหน่งหมู่เกาะในประเทศไทย (Overview)</h3>
+        <div id="map-thailand" class="map-container border border-blue-50"></div>
+        <p class="text-center text-sm text-slate-400 mt-4">แสดงตำแหน่งพิกัดหมู่เกาะตะรุเตาเทียบกับระดับประเทศไทย</p>
+      </div>
+    </section>
+
+    <!-- 7. ECOLOGY SECTION -->
+    <section id="ecology" class="mb-24 scroll-mt-20">
+      <h2 class="text-3xl font-semibold mb-8 border-l-8 border-cyan-500 pl-4">กราฟเปรียบเทียบนิเวศวิทยา</h2>
+      <div class="bg-white p-8 rounded-3xl shadow-sm h-[450px]"><canvas id="ecoChart"></canvas></div >
+    </section>
+
+    <!-- 8. REFERENCES SECTION -->
+    <section id="references" class="mb-24 scroll-mt-20 border-t border-slate-200 pt-12">
+      <h2 class="text-3xl font-semibold mb-8 text-slate-700">เอกสารอ้างอิง (References)</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+        <div class="pl-4 border-l-4 border-cyan-500">
+          <p class="font-semibold text-slate-800">กรมอุทยานแห่งชาติ สัตว์ป่า และพันธุ์พืช.</p>
+          <p class="text-sm text-slate-600 italic">(2567). <em class="not-italic font-medium">ข้อมูลฐานทรัพยากรและพื้นที่อุทยานแห่งชาติหมู่เกาะตะรุเตา</em>. สืบค้นจากเว็บไซต์กรมอุทยานแห่งชาติฯ.</p>
+        </div >
+        <div class="pl-4 border-l-4 border-cyan-500">
+          <p class="font-semibold text-slate-800">กรมทรัพยากรทางทะเลและชายฝั่ง.</p>
+          <p class="text-sm text-slate-600 italic">(2566). <em class="not-italic font-medium">รายงานสถานภาพความหลากหลายทางชีวภาพทางทะเลในเขตอันดามันตอนล่าง</em>. สืบค้นจากเว็บไซต์กรมทรัพยากรทางทะเลฯ.</p>
+        </div >
+      </div>
+    </section>
+
+    <!-- 9. SAFETY SECTION -->
+    <section id="safety" class="mb-24 scroll-mt-20">
+      <div class="bg-red-50 border border-red-100 rounded-3xl p-8">
+        <h2 class="text-3xl font-semibold mb-6 text-red-600 flex items-center">🚨 ส่วนความปลอดภัย</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="space-y-4">
+            <h3 class="font-bold text-xl">วิธีรับมือสถานการณ์ฉุกเฉิน</h3>
+            <ul class="list-disc list-inside text-slate-700 space-y-3 text-lg">
+              <li>แจ้งเจ้าหน้าที่อุทยานฯ ทันทีเมื่อเกิดเหตุ</li>
+              <li>ติดตามพยากรณ์อากาศอย่างใกล้ชิด</li>
+              <li>ปฏิบัติตามกฎระเบียบการท่องเที่ยวอย่างเคร่งครัด</li>
+            </ul >
+          </div >
+          <div class="space-y-4">
+            <h3 class="font-bold text-xl">ช่องทางติดตามทางการ</h3>
+            <div class="flex flex-wrap gap-3">
+              <span class="px-4 py-2 bg-white rounded-full text-sm shadow-sm border border-red-100">Facebook: อุทยานแห่งชาติตะรุเตา</span>
+              <span class="px-4 py-2 bg-white rounded-full text-sm shadow-sm border border-red-100">Line: @TarutaoPark</span>
+            </div >
+          </div >
+        </div >
+      </div >
+    </section>
+
+  </main>
+
+  <!-- 10. FOOTER -->
+  <footer class="bg-slate-900 text-white py-12">
+    <div class="max-w-6xl mx-auto px-6 text-center">
+      <h2 class="text-xl font-bold mb-6 text-red-400 underline decoration-red-500/50 underline-offset-8">เบอร์หน่วยงานและสายด่วนฉุกเฉิน</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12 text-sm">
+        <div class="p-4 border border-slate-700 rounded-xl"><p class="opacity-50">อุทยานฯ</p><p class="text-lg font-bold text-cyan-400">075-644-999</p></div >
+        <div class="p-4 border border-slate-700 rounded-xl"><p class="opacity-50">กู้ภัย</p><p class="text-lg font-bold text-cyan-400">191 / 1193</p></div >
+        <div class="p-4 border border-slate-700 rounded-xl"><p class="opacity-50">แพทย์ฉุกเฉิน</p><p class="text-lg font-bold text-cyan-400">1669</p></div >
+        <div class="p-4 border border-slate-700 rounded-xl"><p class="opacity-50">สายด่วนท่องเที่ยว</p><p class="text-lg font-bold text-cyan-400">1155</p></div >
+      </div >
+      <div class="pt-8 border-t border-slate-800 opacity-50 text-xs">
+        <p>© 2024 Tarutao Research Project | จัดทำโดย นางสาวนัจมีย์ แลซามิง (6820210259)</p>
+      </div >
+    </div >
+  </footer >
+
+  <script>
+    // --- GOOGLE MAPS INITIALIZATION ---
+    let mapThailand;
+    const tarutaoCoords = { lat: 6.5, lng: 98.9 };
+
+    function initMap() {
+      mapThailand = new google.maps.Map(document.getElementById("map-thailand"), {
+        center: { lat: 7, lng: 100 },
+        zoom: 5,
+        disableDefaultUI: true,
+      });
+      new google.maps.Marker({ position: tarutaoCoords, map: mapThailand, title: "หมู่เกาะตะรุเตา" });
+    }
+
+    // --- CHARTS INITIALIZATION ---
+    window.addEventListener('load', function() {
+        const ctxArea = document.getElementById('areaChart').getContext('2d');
+        new Chart(ctxArea, {
+          type: 'doughnut',
+          data: {
+            labels: ['ป่าดิบชื้น', 'ชายหาด', 'ภูเขา', 'อื่นๆ'],
+            datasets: [{
+              data: [55, 15, 20, 10],
+              backgroundColor: ['#065f46', '#f97316', '#64748b', '#0ea5e9'],
+              borderWidth: 0
+            }]
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        const ctxEco = document.getElementById('ecoChart').getContext('2d');
+        new Chart(ctxEco, {
+          type: 'bar',
+          data: {
+            labels: ['ปะการัง', 'ป่าชายเลน', 'หญ้าทะเล', 'สัตว์ทะเล'],
+            datasets: [{
+              label: 'ความหลากหลาย (%)',
+              data: [88, 72, 45, 92],
+              backgroundColor: '#00a896',
+              borderRadius: 0,
+              barPercentage: 0.4,
+              categoryPercentage: 0.8
+            }]
+          },
+          options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            scales: { y: { beginAtZero: true, max: 100 } },
+            plugins: { legend: { display: false } }
+          }
+        });
+    });
+  </script>
+</body >
+</html>
